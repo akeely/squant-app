@@ -12,5 +12,6 @@
         <module>squant-core</module>
         <module>squant-lambda</module>
         <module>squant-dynamo</module>
+        <module>squant-web</module>
     </modules>
 </project>
