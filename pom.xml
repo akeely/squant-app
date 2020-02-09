@@ -16,6 +16,9 @@
 
 	<properties>
 		<java.version>13</java.version>
+		<!-- Populate these in .m2/settings.xml -->
+		<google.client.id>client-id</google.client.id>
+		<google.client.secret>secret</google.client.secret>
 	</properties>
 
 	<dependencies>
