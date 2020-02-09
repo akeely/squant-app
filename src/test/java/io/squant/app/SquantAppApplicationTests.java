@@ -1,4 +1,4 @@
-package io.squant.squantapp;
+package io.squant.app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

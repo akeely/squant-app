@@ -1,7 +1,7 @@
 # Read Me First
 The following was discovered as part of building this project:
 
-* The original package name 'io.squant.squant-app' is invalid and this project uses 'io.squant.squantapp' instead.
+* The original package name 'io.squant.squant-app' is invalid and this project uses 'io.squant.app' instead.
 
 # Getting Started
 
