@@ -5,5 +5,5 @@ import io.squant.app.resource.Page;
 
 public interface BetDao {
 
-    Page<Bet> find(String userId, boolean includePaid, int index, int size);
+    Page<Bet> find(int userId, boolean includePaid, int index, int size);
 }
