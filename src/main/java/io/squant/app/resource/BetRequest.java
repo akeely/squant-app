@@ -5,36 +5,29 @@ import static java.util.Objects.requireNonNull;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-public class Bet {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private final User creator;
-    private final User against;
-    private final User winner;
+public class BetRequest {
+
+    private final String against;
     private final BigDecimal amount;
     private final String currency;
     private final String description;
-    private final boolean paid;
 
-    public Bet(User creator, User against, User winner, BigDecimal amount, String currency, String description, boolean paid) {
-        this.creator = requireNonNull(creator, "creator");
+    @JsonCreator
+    public BetRequest(@JsonProperty("against") String against,
+            @JsonProperty("amount") BigDecimal amount,
+            @JsonProperty("currency") String currency,
+            @JsonProperty("description") String description) {
         this.against = requireNonNull(against, "against");
-        this.winner = winner;
         this.amount = requireNonNull(amount, "amount");
         this.currency = requireNonNull(currency, "currency");
         this.description = requireNonNull(description, "description");
-        this.paid = paid;
     }
 
-    public User getCreator() {
-        return creator;
-    }
-
-    public User getAgainst() {
+    public String getAgainst() {
         return against;
-    }
-
-    public Optional<User> getWinner() {
-        return Optional.ofNullable(winner);
     }
 
     public BigDecimal getAmount() {
@@ -47,9 +40,5 @@ public class Bet {
 
     public String getDescription() {
         return description;
-    }
-
-    public boolean isPaid() {
-        return paid;
     }
 }

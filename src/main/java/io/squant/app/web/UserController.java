@@ -1,9 +1,9 @@
 package io.squant.app.web;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -25,69 +25,37 @@ import io.squant.app.resource.Page;
 import io.squant.app.resource.User;
 
 @RestController
-@RequestMapping("/api/1/bets")
-public class BetController {
+@RequestMapping("/api/1/users")
+public class UserController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BetController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
-    private final BetDao betDao;
     private final UserDao userDao;
 
-    public BetController(BetDao betDao, UserDao userDao) {
-        this.betDao = betDao;
+    public UserController(UserDao userDao) {
+
         this.userDao = userDao;
     }
 
     @GetMapping
-    public Page<Bet> findBets(Principal principal,
+    public Page<User> findAll(Principal principal,
             @RequestParam(required = false, defaultValue = "0") int index,
             @RequestParam(required = false, defaultValue = "500") int size) {
 
         io.squant.app.dao.data.User user = getOrAddUser(principal);
-        List<Bet> bets = betDao.findByUser(user.getId(), index, size).stream()
+        List<User> allUsers = userDao.findAll().stream()
+                .filter(u -> u.getId() != user.getId())
+                .sorted(Comparator.comparing(io.squant.app.dao.data.User::getName))
                 .map(this::toDto)
                 .collect(Collectors.toList());
 
-        int count = betDao.countByUser(user.getId());
+        int count = allUsers.size() + 1;
 
-        return new Page<>(bets, index, count);
-    }
-
-    private Bet toDto(io.squant.app.dao.data.Bet bet) {
-
-        Map<Integer, User> users = userDao.findAll().stream()
-                .collect(Collectors.toMap(io.squant.app.dao.data.User::getId, this::toDto));
-
-        return new Bet(users.get(bet.getCreator()),
-                users.get(bet.getAgainst()),
-                bet.getWinner() == null ? null : users.get(bet.getWinner()),
-                bet.getAmount(),
-                bet.getCurrency(),
-                bet.getDescription(),
-                bet.isPaid());
+        return new Page<>(allUsers, index, count);
     }
 
     private User toDto(io.squant.app.dao.data.User user) {
         return new User(user.getExternalId(), user.getName(), user.getEmail());
-    }
-
-    @PostMapping
-    public void addBet(Principal principal, @RequestBody BetRequest bet) {
-
-        io.squant.app.dao.data.User creator = getOrAddUser(principal);
-        betDao.save(toBet(creator.getId(), bet));
-    }
-
-    private io.squant.app.dao.data.Bet toBet(int creatorId, BetRequest bet) {
-
-        io.squant.app.dao.data.User against = userDao.findByExternalId(bet.getAgainst());
-
-        return new io.squant.app.dao.data.Bet(
-                creatorId,
-                against.getId(),
-                bet.getAmount(),
-                bet.getCurrency(),
-                bet.getDescription());
     }
 
     private io.squant.app.dao.data.User getOrAddUser(Principal principal) {
@@ -97,7 +65,6 @@ public class BetController {
         String email = oauthUser.getAttribute("email");
         String name = oauthUser.getAttribute("name");
         User user = new User(null, name, email);
-        LOG.info("Retrieving bets for {}.", user);
 
         return userDao.put(user);
     }

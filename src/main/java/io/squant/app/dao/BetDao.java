@@ -1,9 +1,14 @@
 package io.squant.app.dao;
 
-import io.squant.app.resource.Bet;
-import io.squant.app.resource.Page;
+import java.util.List;
+
+import io.squant.app.dao.data.Bet;
 
 public interface BetDao {
 
-    Page<Bet> find(int userId, boolean includePaid, int index, int size);
+    List<Bet> findByUser(int userId, int index, int size);
+
+    int countByUser(int userId);
+
+    void save(Bet bet);
 }
