@@ -30,7 +30,7 @@ public class User {
     @Override
     public String toString() {
         return new StringJoiner(", ", User.class.getSimpleName() + "[", "]")
-                .add("name='" + id + "'")
+                .add("id='" + id + "'")
                 .add("name='" + name + "'")
                 .add("email='" + email + "'")
                 .toString();
