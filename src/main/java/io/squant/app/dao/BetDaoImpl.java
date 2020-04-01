@@ -56,8 +56,8 @@ public class BetDaoImpl implements BetDao {
                 bet.getCurrency());
 
         String sql = """
-                INSERT INTO bets (createTime, creator, against, amount, currency, description)
-                VALUES (:createTime, :creator, :against, :amount, :currency, :description);
+                INSERT INTO bets (createTime, creator, against, amount, currency, description, externalId)
+                VALUES (:createTime, :creator, :against, :amount, :currency, :description, :externalId);
                 """;
 
         Map<String, Object> params = Map.of(
@@ -66,8 +66,46 @@ public class BetDaoImpl implements BetDao {
                 "against", bet.getAgainst(),
                 "amount", bet.getAmount(),
                 "currency", bet.getCurrency(),
-                "description", bet.getDescription());
+                "description", bet.getDescription(),
+                "externalId", bet.getExternalId());
 
         jdbcTemplate.update(sql, params);
+    }
+
+    @Override
+    public Bet findByExternalId(String externalId) {
+
+        String sql = "SELECT * FROM bets WHERE externalId = :externalId;";
+        Map<String, String> params = Map.of("externalId", externalId);
+        return jdbcTemplate.queryForObject(sql, params, BET_MAPPER);
+    }
+
+    @Override
+    public void setWinner(int id, int winnerId) {
+
+        String sql = """
+                UPDATE bets
+                SET winner = :winnerId
+                WHERE id = :id;
+                """;
+
+        Map<String, Object> params = Map.of("id", id, "winnerId", winnerId);
+
+        jdbcTemplate.update(sql, params);
+    }
+
+    @Override
+    public void markPaid(int id) {
+
+        String sql = """
+                UPDATE bets
+                SET paid = 1
+                WHERE id = :id;
+                """;
+
+        Map<String, Object> params = Map.of("id", id);
+
+        jdbcTemplate.update(sql, params);
+
     }
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public class Bet {
 
+    private final String id;
     private final User creator;
     private final User against;
     private final User winner;
@@ -15,7 +16,16 @@ public class Bet {
     private final String description;
     private final boolean paid;
 
-    public Bet(User creator, User against, User winner, BigDecimal amount, String currency, String description, boolean paid) {
+    public Bet(String id,
+            User creator,
+            User against,
+            User winner,
+            BigDecimal amount,
+            String currency,
+            String description,
+            boolean paid) {
+
+        this.id = requireNonNull(id, "id");
         this.creator = requireNonNull(creator, "creator");
         this.against = requireNonNull(against, "against");
         this.winner = winner;
@@ -23,6 +33,10 @@ public class Bet {
         this.currency = requireNonNull(currency, "currency");
         this.description = requireNonNull(description, "description");
         this.paid = paid;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public User getCreator() {
