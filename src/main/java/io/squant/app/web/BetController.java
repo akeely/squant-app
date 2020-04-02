@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,12 +55,36 @@ public class BetController {
         return new Page<>(bets, index, count);
     }
 
+    @PostMapping
+    public void addBet(Principal principal, @RequestBody BetRequest bet) {
+
+        io.squant.app.dao.data.User creator = getOrAddUser(principal);
+        betDao.save(toBet(creator.getId(), bet));
+    }
+
+    @PutMapping("/{id}/winner")
+    public void updateWinner(@PathVariable("id") String betId, @RequestBody User winner) {
+
+        int winnerId = userDao.findByExternalId(winner.getId()).getId();
+
+        io.squant.app.dao.data.Bet bet = betDao.findByExternalId(betId);
+        betDao.setWinner(bet.getId(), winnerId);
+    }
+
+    @PostMapping("/{id}/paid")
+    public void markPaid(@PathVariable("id") String betId) {
+
+        io.squant.app.dao.data.Bet bet = betDao.findByExternalId(betId);
+        betDao.markPaid(bet.getId());
+    }
+
     private Bet toDto(io.squant.app.dao.data.Bet bet) {
 
         Map<Integer, User> users = userDao.findAll().stream()
                 .collect(Collectors.toMap(io.squant.app.dao.data.User::getId, this::toDto));
 
-        return new Bet(users.get(bet.getCreator()),
+        return new Bet(bet.getExternalId(),
+                users.get(bet.getCreator()),
                 users.get(bet.getAgainst()),
                 bet.getWinner() == null ? null : users.get(bet.getWinner()),
                 bet.getAmount(),
@@ -69,13 +95,6 @@ public class BetController {
 
     private User toDto(io.squant.app.dao.data.User user) {
         return new User(user.getExternalId(), user.getName(), user.getEmail());
-    }
-
-    @PostMapping
-    public void addBet(Principal principal, @RequestBody BetRequest bet) {
-
-        io.squant.app.dao.data.User creator = getOrAddUser(principal);
-        betDao.save(toBet(creator.getId(), bet));
     }
 
     private io.squant.app.dao.data.Bet toBet(int creatorId, BetRequest bet) {

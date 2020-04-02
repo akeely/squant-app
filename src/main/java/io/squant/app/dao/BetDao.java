@@ -8,7 +8,13 @@ public interface BetDao {
 
     List<Bet> findByUser(int userId, int index, int size);
 
+    Bet findByExternalId(String externalId);
+
     int countByUser(int userId);
 
     void save(Bet bet);
+
+    void setWinner(int id, int winnerId);
+
+    void markPaid(int id);
 }
