@@ -6,6 +6,10 @@ import io.squant.app.dao.data.Bet;
 
 public interface BetDao {
 
+    List<Bet> findAll(int index, int size);
+
+    int countAll();
+
     List<Bet> findByUser(int userId, int index, int size);
 
     Bet findByExternalId(String externalId);

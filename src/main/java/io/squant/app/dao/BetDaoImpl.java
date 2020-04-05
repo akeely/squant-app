@@ -25,6 +25,29 @@ public class BetDaoImpl implements BetDao {
     }
 
     @Override
+    public List<Bet> findAll(int index, int size) {
+        LOG.info("Getting all bets. Page idx: {}, size: {}.", index, size);
+
+        String sql = """
+                SELECT *
+                FROM bets b
+                ORDER BY id
+                LIMIT :size
+                OFFSET :index;
+                """;
+
+        Map<String, Object> params = Map.of("index", index, "size", size);
+
+        return jdbcTemplate.query(sql, params, BET_MAPPER);
+    }
+
+    @Override
+    public int countAll() {
+        String countSql = "SELECT COUNT(*) FROM bets;";
+        return jdbcTemplate.queryForObject(countSql, Map.of(), Integer.class);
+    }
+
+    @Override
     public List<Bet> findByUser(int userId, int index, int size) {
 
         LOG.info("Getting bets for {}. Page idx: {}, size: {}.", userId, index, size);
@@ -33,6 +56,7 @@ public class BetDaoImpl implements BetDao {
                 SELECT *
                 FROM bets b
                 WHERE (b.creator = :userId OR b.against = :userId)
+                ORDER BY id
                 LIMIT :size
                 OFFSET :index;
                 """;
