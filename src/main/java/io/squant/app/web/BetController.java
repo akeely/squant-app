@@ -41,7 +41,20 @@ public class BetController {
     }
 
     @GetMapping
-    public Page<Bet> findBets(Principal principal,
+    public Page<Bet> findAll(@RequestParam(required = false, defaultValue = "0") int index,
+            @RequestParam(required = false, defaultValue = "500") int size) {
+
+        List<Bet> bets = betDao.findAll(index, size).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+
+        int count = betDao.countAll();
+
+        return new Page<>(bets, index, count);
+    }
+
+    @GetMapping("/user/me")
+    public Page<Bet> findMyBets(Principal principal,
             @RequestParam(required = false, defaultValue = "0") int index,
             @RequestParam(required = false, defaultValue = "500") int size) {
 

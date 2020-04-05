@@ -37,6 +37,13 @@ public class UserController {
         this.userDao = userDao;
     }
 
+    @GetMapping("/me")
+    public User findMe(Principal principal) {
+
+        io.squant.app.dao.data.User user = getOrAddUser(principal);
+        return toDto(user);
+    }
+
     @GetMapping
     public Page<User> findAll(Principal principal,
             @RequestParam(required = false, defaultValue = "0") int index,
